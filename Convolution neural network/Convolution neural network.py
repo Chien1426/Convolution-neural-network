@@ -35,17 +35,12 @@ from skimage.filters import unsharp_mask
 from skimage.restoration import denoise_bilateral
 from skimage.restoration import denoise_wavelet
 from keras.layers import BatchNormalization,Activation, regularizers
-from skimage.filters import roberts, sobel
-from skimage import segmentation
-from scipy.signal import wiener
 from keras.preprocessing import image
-from skimage.filters import sobel_v
 from scipy.signal import convolve2d as conv2
 from skimage import color, data, restoration
 from keras.layers import Input
 from keras.layers import Conv2D, MaxPool2D, Dense, BatchNormalization, Activation, add, GlobalAvgPool2D
 from skimage import color, data, restoration
-from skimage import exposure
 from cv2 import createCLAHE
 import time
 
@@ -66,6 +61,7 @@ test_savepath = os.listdir(savepath_test))
 
 x_train = np.empty((len(train_savepath), im_W, im_H, datachannel), dtype="uint8")
 v_train = [0] * len(train_savepath)
+clahe= createCLAHE()
 for i in range(len(train_savepath)):
     if (int(train_savepath[i][0]) == 0):
         v_train[i] = 0
@@ -73,8 +69,8 @@ for i in range(len(train_savepath)):
         v_train[i] = 1
     img_train = Image.open(savepath_train + train_savepath[i])
     npimg_train = np.asarray(img_train, dtype="uint8")
-    # img_adapteq_train = exposure.equalize_adapthist(npimg_train, clip_limit=0.01)
-    # X_unsharp_train=unsharp_mask(img_adapteq_train,radius=3,amount=2)
+    # clahe_train = clahe.apply(npimg_train)
+    # X_unsharp_train=unsharp_mask(clahe_train)
     im_train = misc.imresize(npimg_train, (im_W, im_H))
     rsimg_train = im_train.reshape(im_W, im_H, datachannel)
     x_train[i, :, :, :] = rsimg_train
@@ -88,8 +84,8 @@ for il in range(len(test_savepath)):
         v_test[il] = 1
     img_test = Image.open(savepath_test + test_savepath[il])
     npimg_test = np.asarray(img_test, dtype="uint8")
-    # img_adapteq_test = exposure.equalize_adapthist(npimg_test, clip_limit=0.01)
-    # X_unsharp_test=unsharp_mask(img_adapteq_test,radius=3,amount=2)
+    # clahe_test = clahe.apply(npimg_test)
+    # X_unsharp_test=unsharp_mask(clahe_test)
     im_test = misc.imresize(npimg_test, (im_W, im_H))
     rsimg_test = im_test.reshape(im_W, im_H, datachannel)
     x_test[il, :, :, :] = rsimg_test
